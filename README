@@ -1,0 +1,45 @@
+﻿ Movie Recommendation Engine for Netflix and MovieLens datasets
+
+Technology: Python and MySQL
+Methodology: Item-Similarity based Collaborative filtering algorithm, because of the sparse of both datasets 
+Similarity Metric: L2 distance
+
+Step-1: Database Design
+
+Since the dataset is huge and the method requires lots of quick indexing into the database, hence I decided to implement
+a database-based design. There are two entities, Users and Movies which participate in a binary Relationship, Watched, In the ER scheme:
+
+User ( uID)
+Movie (mID)
+Watched (uID,mID, rating, date)
+
+Since both the users and Movies have just one attribute which is their primary key so it is sufficient to make a single table to represent the above ER model. The Table is Watched and it has Primary key (uID. mID) .
+After that data is read from the dataset files and tables are populated, the Netflix dataset is huge with about 100Million movie ratings and the Movielens dataset contains 100 thousand movie ratings. So two databases Netflix and Movielens were formed with their corresponding tables Watched.
+
+Step-2: ItemMatch Table
+
+Keeping in view the sparse nature of the database, I used Item-based collaborative filtering method which requires making up a Database of every movie with a similarity score with every other movie and then this similarity score is used to predict movie ratings. For more info on this please check out:  http://citeseer.ist.psu.edu/sarwar01itembased.html
+So this database is formed and stored as a MySQL table ItemMatch. This is the training step of the algorithm and is O(n2)
+by the Hand-Shaking theorem.
+So as evident, the training step would take ages for the full Netflix dataset which contains 100 million user ratings and around 18 thousand movies. So stay tuned for a MapReduce based solution for this step in my next Github :). So the current version has been tested with the Movielens dataset.
+
+Step-3: Movie Rating Prediction and Movie Recommendation:
+
+Now that we have the two Database tables ready, we can very easily perform the prediction step which only required indexing into the databases, finding User movies and then finding their similar movies list and predicting the user rating by taking a weighted average. Again, for details see the paper mentioned above.
+A sample run gives a sorted list of recommended movies for a user and his predicted scores for those movies.!!!
+The top-5 recommended movies with his predicted ratings for them for a Random User (uID: 87) are:
+
+Ill Gotten Gains (1997) 4.52652259332
+They Made Me a Criminal (1939) 4.42857142857
+Cyclo (1995) 4.40579710145
+Legal Deceit (1997) 4.39384164223
+I Don't Want to Talk About It (De eso no se habla) (1993) 4.36296296296
+Mamma Roma (1962) 4.35729847495
+Marlene Dietrich: Shadow and Light (1996)  4.35665914221
+Death in Brunswick (1991) 4.35126582278
+
+ 
+
+
+
+
